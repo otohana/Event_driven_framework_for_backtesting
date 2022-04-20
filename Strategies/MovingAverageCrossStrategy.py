@@ -7,7 +7,7 @@ from event import SignalEvent
 class MovingAverageCrossStrategy(Strategy):
     """
     用来进行基本的移动平均跨越测录的实现，这个策略有一组短期和长期的简单移动平均值。
-    默认的短期/长期的窗口分别是100天和400天。
+    默认的短期/长期的窗口分别是100天和300天。
     """
 
     def __init__(
@@ -48,16 +48,19 @@ class MovingAverageCrossStrategy(Strategy):
                     symbol = s
                     dt = datetime.datetime.utcnow()
                     sig_dir = ""
-                    order_price = self.bars.get_latest_bars_values(s, 'adj_close')
+                    order_price = self.bars.get_latest_bars_values(
+                        s, 'adj_close')
                     if short_sma > long_sma and self.bought[s] == "OUT":
                         print("LONG: %s" % bar_date)
                         sig_dir = 'LONG'
-                        signal = SignalEvent(1, bar_date, symbol, dt, sig_dir, order_price, 1.0)
+                        signal = SignalEvent(
+                            1, bar_date, symbol, dt, sig_dir, order_price, 1.0)
                         self.events.put(signal)
                         self.bought[s] = 'LONG'
                     elif short_sma < long_sma and self.bought[s] == "LONG":
                         print("SHORT:%s" % bar_date)
                         sig_dir = 'EXIT'
-                        signal = SignalEvent(1, bar_date, symbol, dt, sig_dir, order_price, 1.0)
+                        signal = SignalEvent(
+                            1, bar_date, symbol, dt, sig_dir, order_price, 1.0)
                         self.events.put(signal)
                         self.bought[s] = 'OUT'

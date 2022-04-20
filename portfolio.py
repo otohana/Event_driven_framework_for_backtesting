@@ -31,12 +31,11 @@ class Portfolio(object):
 
         self.all_positions = self.__construct_all_positions()
 
-        self.current_positions = dict((k, v) for k, v in \
+        self.current_positions = dict((k, v) for k, v in
                                       [(s, 0) for s in self.symbol_list])
 
         self.all_holdings = self.__construct_all_holdings()
         self.current_holdings = self.__construct_current_holdings()
-
 
     def __construct_all_positions(self):
         """
@@ -73,13 +72,18 @@ class Portfolio(object):
         self.latest_datetime = self.bars.get_latest_bar_datetime(
             self.symbol_list[0]
         )
+        # Update positions
+        # ================
         dp = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
         dp['datetime'] = self.latest_datetime
         for s in self.symbol_list:
             dp[s] = self.current_positions[s]
 
+        # Append the current positions
         self.all_positions.append(dp)
 
+        # Update holdings
+        # =================
         dh = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
         dh['datetime'] = self.latest_datetime
         dh['cash'] = self.current_holdings['cash']
@@ -88,7 +92,7 @@ class Portfolio(object):
 
         for s in self.symbol_list:
             market_value = self.current_positions[s] * \
-                           self.bars.get_latest_bar_value(s, "adj_close")
+                self.bars.get_latest_bar_value(s, "adj_close")
             dh[s] = market_value
             dh['total'] += market_value
         self.all_holdings.append(dh)
@@ -102,7 +106,8 @@ class Portfolio(object):
             fill_dir = 1
         if fill_event.buy_or_sell == 'SELL':
             fill_dir = -1
-        self.current_positions[fill_event.symbol] += fill_dir * fill_event.quantity
+        self.current_positions[fill_event.symbol] += fill_dir * \
+            fill_event.quantity
 
     def update_holdings_from_fill(self, fill):
         """
@@ -117,7 +122,7 @@ class Portfolio(object):
         fill_cost = self.bars.get_latest_bar_value(
             fill.symbol, "adj_close"
         )
-        cost = fill_dir * fill_cost * fill.quantity;
+        cost = fill_dir * fill_cost * fill.quantity
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
         self.current_holdings['cash'] -= (cost + fill.commission)
