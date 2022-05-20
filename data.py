@@ -4,7 +4,8 @@
 from __future__ import print_function
 
 from abc import ABCMeta, abstractmethod
-import os, os.path
+import os
+import os.path
 
 import numpy as np
 import pandas as pd
@@ -82,7 +83,7 @@ class HistoricCSVDataHandler(DataHandler):
         self.latest_symbol_data = {}
         self.continue_backtest = True
         self.bar_index = 0
-        self.data_generator={}
+        self.data_generator = {}
         self._open_convert_csv_files()
 
     def _open_convert_csv_files(self):
@@ -110,14 +111,16 @@ class HistoricCSVDataHandler(DataHandler):
             self.symbol_data[s] = self.symbol_data[s].reindex(
                 index=comb_index, method='pad'
             )
-            self.symbol_data[s]["pct_change"] = self.symbol_data[s]["adj_close"].pct_change()
+            self.symbol_data[s]["pct_change"] = self.symbol_data[s]["adj_close"].pct_change(
+            )
             # self.symbol_data[s] = self.symbol_data[s].iterrows()  #make the symbol_data as a generator
             self.data_generator[s] = self.symbol_data[s].iterrows()
+
     def _get_new_bar(self, symbol):
         """
         从数据集返回最新的数据条目
         """
-        for b in  self.data_generator[symbol]:
+        for b in self.data_generator[symbol]:
             yield b
 
     def get_latest_bar(self, symbol):

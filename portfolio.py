@@ -83,7 +83,7 @@ class Portfolio(object):
         self.all_positions.append(dp)
 
         # Update holdings
-        # =================
+        # == == == == == == == == =
         dh = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
         dh['datetime'] = self.latest_datetime
         dh['cash'] = self.current_holdings['cash']

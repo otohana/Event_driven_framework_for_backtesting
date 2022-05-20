@@ -30,6 +30,12 @@ class ExecutionHandler(object, metaclass=ABCMeta):
         raise NotImplementedError("Should implement execute_order()")
 
 
+"""
+TODO
+implement a executionhandler that can deal with slippery and latency
+"""
+
+
 class SimulatedExecutionHandler(ExecutionHandler):
     """
     这是一个模拟的执行处理，简单的将所有的订单对象转化为等价的成交对象，不考虑
@@ -39,9 +45,10 @@ class SimulatedExecutionHandler(ExecutionHandler):
     def __init__(self, events):
         self.events = events
         self.execution_records = pd.DataFrame(columns=['date_time', 'symbol', 'direction', 'quantity', 'order_price',
-                                                       'return_profit', 'return_profit_pct' ])
+                                                       'return_profit', 'return_profit_pct'])
         self.recent_deal_average_cost = 0
         self.entry_time = 0
+
     def execute_order(self, event):
         """
         Generate the order event and make the execution log
@@ -55,19 +62,21 @@ class SimulatedExecutionHandler(ExecutionHandler):
                 self.entry_time += 1
                 self.execution_records = self.execution_records.append(
                     pd.DataFrame(
-                        {'date_time': [event.date_time],'symbol': [event.symbol],'direction': [event.direction],
+                        {'date_time': [event.date_time], 'symbol': [event.symbol], 'direction': [event.direction],
                          'quantity': [event.quantity], 'order_price': [event.order_price],
                          'return_profit': None, 'return_profit_pct': None}))
-                self.recent_deal_average_cost = self.recent_deal_average_cost*(self.entry_time-1)/(self.entry_time) + event.order_price/(self.entry_time)
+                self.recent_deal_average_cost = self.recent_deal_average_cost * \
+                    (self.entry_time-1)/(self.entry_time) + \
+                    event.order_price/(self.entry_time)
             else:
-                return_profit = (event.order_price - self.recent_deal_average_cost)*event.quantity
-                return_profit_pct = (event.order_price - self.recent_deal_average_cost)/self.recent_deal_average_cost
+                return_profit = (event.order_price -
+                                 self.recent_deal_average_cost)*event.quantity
+                return_profit_pct = (
+                    event.order_price - self.recent_deal_average_cost)/self.recent_deal_average_cost
                 self.execution_records = self.execution_records.append(
                     pd.DataFrame(
                         {'date_time': [event.date_time], 'symbol': [event.symbol], 'direction': [event.direction],
-                         'quantity': [event.quantity], 'order_price': [event.order_price],'return_profit': return_profit,
-                         'return_profit_pct': return_profit_pct }))
+                         'quantity': [event.quantity], 'order_price': [event.order_price], 'return_profit': return_profit,
+                         'return_profit_pct': return_profit_pct}))
                 self.recent_deal_average_cost = 0
                 self.entry_time = 0
-
-
