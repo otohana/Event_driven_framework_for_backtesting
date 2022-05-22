@@ -1,0 +1,4 @@
+# for stock data
+*.csv
+
+*.pyc

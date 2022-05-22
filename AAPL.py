@@ -54,7 +54,7 @@ if __name__ == "__main__":
     path1 = os.path.abspath('.')
     csv_dir = 'data_csv'
     csv_dir = os.path.join(path1, csv_dir)
-    symbol_list = ['AAPL']
+    symbol_list = ['MSFT']
     # symbol_list = ['hs300']
     initial_capital = 100000.0
     heartbeat = 0.0
